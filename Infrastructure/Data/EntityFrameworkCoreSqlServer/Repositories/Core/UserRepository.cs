@@ -59,7 +59,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
         {
             IQueryable<User> queryable = DbSet;
 
-            queryable = queryable.Where(u => u.Id == id);
+            queryable = queryable.Where(u => u.Id == id).Include(u => u.Profile);
 
             return queryable.FirstAsync(cancellationToken);
         }
@@ -70,7 +70,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
         {
             IQueryable<User> queryable = DbSet;
 
-            queryable = queryable.Where(predicate);
+            queryable = queryable.Where(predicate).Include(u => u.Profile);
 
             return queryable.FirstAsync(cancellationToken);
         }
@@ -99,6 +99,18 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
             }
         }
 
+        public void UpdateChangePassword(User user, bool status = true)
+        {
+            DbContext.Entry(user).Property(user => user.ChangePassword).CurrentValue = status;
+            Update(user);
+        }
+
+        public void UpdateIsSuspended(User user, bool status = true)
+        {
+            DbContext.Entry(user).Property(user => user.IsSuspended).CurrentValue = status;
+            Update(user);
+        }
+
         public void Delete(User user)
         {
             if (DbContext.Entry(user).State == EntityState.Detached)
@@ -109,7 +121,8 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
             DbSet.Remove(user);
         }
 
-        public override Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken = default)
+        public override Task<IdentityResult> DeleteAsync(
+            User user, CancellationToken cancellationToken = default)
         {
             try
             {

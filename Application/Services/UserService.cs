@@ -2,6 +2,7 @@
 using Domain.Core.Abstracts;
 using Domain.Core.Dtos;
 using Infrastructure.Data.Abstracts;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Services
@@ -15,36 +16,63 @@ namespace Application.Services
 
         readonly IUnitOfWork Uow;
         public IUserRepository UserRepository => Uow.UserRepository;
+        public IRoleRepository RoleRepository => Uow.RoleRepository;
+        public IPermissionRepository PermissionRepository => Uow.PermissionRepository;
 
-        public async Task<User> Create(UserDto UserDto)
+        public async Task<User> Create(UserDto UserDto, CancellationToken cancellationToken = default)
         {
             var User = Map(UserDto);
 
-            User = await Uow.UserRepository.Add(User);
-            await Uow.Commit();
+            User = await UserRepository.Add(User);
+            await Uow.Commit(cancellationToken);
 
             return User;
         }
 
-        public Task Update(User user, UserDto userDto)
+        public Task Update(
+            User user, 
+            UserDto userDto, 
+            CancellationToken cancellationToken = default)
         {
             Map(userDto, user);
 
-            Uow.UserRepository.Update(user);
+            UserRepository.Update(user);
 
-            return Uow.Commit();
+            return Uow.Commit(cancellationToken);
         }
 
-        public Task UpdateChangePassword(User User, bool status = true)
+        public Task UpdateChangePassword(
+            User User, 
+            bool status, 
+            CancellationToken cancellationToken = default)
         {
-            return Uow.Commit();
+            UserRepository.UpdateChangePassword(User, status);
+
+            return Uow.Commit(cancellationToken);
         }
 
-        public Task Delete(User User)
+        public Task UpdateIsSuspended(
+            User User,
+            bool status,
+            CancellationToken cancellationToken = default)
         {
-            Uow.UserRepository.Delete(User);
+            UserRepository.UpdateIsSuspended(User, status);
 
-            return Uow.Commit();
+            return Uow.Commit(cancellationToken);
+        }
+
+        public Task<bool> HasPermission(
+            User user, string permissionName, CancellationToken cancellationToken = default)
+        {
+            // Todo: Call permission repository to find permission by name and where any permission role has any user with the user id
+            return Task.FromResult(true);
+        }
+
+        public Task Delete(User User, CancellationToken cancellationToken = default)
+        {
+            UserRepository.Delete(User);
+
+            return Uow.Commit(cancellationToken);
         }
 
         private User Map(UserDto UserDto, User User = null)

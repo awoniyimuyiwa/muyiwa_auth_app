@@ -1,11 +1,12 @@
 ﻿using Domain.Core;
 using Domain.Core.Abstracts;
 using Domain.Core.Dtos;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.Services.Abstracts
 {
-    public interface IUserService
+    public interface IUserService : IService<UserDto, User>
     {
         /// <summary>
         /// 
@@ -15,29 +16,43 @@ namespace Application.Services.Abstracts
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="userDto"></param>
-        /// <returns>User</returns>
-        Task<User> Create(UserDto userDto);
+        public IRoleRepository RoleRepository { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="userDto"></param>
-        Task Update(User user, UserDto userDto);
+        public IPermissionRepository PermissionRepository { get; }
 
         /// <summary>
         /// Set the change password attribute of a User
         /// </summary>
         /// <param name="user"></param>
         /// <param name="status"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task UpdateChangePassword(User user, bool status = true);
+        Task UpdateChangePassword(User user, bool status = true, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Set the is suspended attribute of a User
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="status"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task UpdateIsSuspended(
+            User user, 
+            bool status = true, 
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="user"></param>
-        Task Delete(User user);
+        /// <param name="permissionName"></param>
+        /// <param name="cancellationToken"></param>
+        Task<bool> HasPermission(
+            User user, 
+            string permissionName, 
+            CancellationToken cancellationToken = default);
     }
 }

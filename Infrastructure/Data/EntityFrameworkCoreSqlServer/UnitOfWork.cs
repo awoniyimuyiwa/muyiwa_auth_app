@@ -2,6 +2,7 @@
 using Infrastructure.Data.Abstracts;
 using Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -28,11 +29,11 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer
             DbContext = dbContext;
         }
 
-        public async Task Commit()
+        public async Task Commit(CancellationToken cancellationToken = default)
         {
             try
             {
-                await DbContext.SaveChangesAsync();
+                await DbContext.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
             {

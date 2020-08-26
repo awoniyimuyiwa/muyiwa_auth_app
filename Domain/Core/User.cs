@@ -25,11 +25,13 @@ namespace Domain.Core
             RoleUsers = new List<IdentityUserRole<int>>();
         }
 
-        public void AddRole(Role role)
+        public void AddRoles(params Role[] roles)
         {
-            var roleUser = new IdentityUserRole<int>() { RoleId = role.Id, UserId = Id };
-           
-            RoleUsers.Add(roleUser);
+            foreach(Role role in roles)
+            {
+                var roleUser = new IdentityUserRole<int>() { RoleId = role.Id, UserId = Id };
+                RoleUsers.Add(roleUser);
+            }
         }
 
         public UserDto ToDto() => new UserDto()
@@ -38,13 +40,6 @@ namespace Domain.Core
             UserName = UserName,
             Email = Email,
             IsSuspended = IsSuspended,
-            Profile = new ProfileDto()
-            {
-                FirstName = Profile.FirstName,
-                LastName = Profile.LastName,
-                Gender = Profile.Gender.ToString(),
-                DateOfBirth = Profile.DateOfBirth != null ? Formatter.Format(Profile.DateOfBirth) : null
-            },
             CreatedAt = CreatedAt != null ? Formatter.Format(CreatedAt) : null,
             UpdatedAt = UpdatedAt != null ? Formatter.Format(UpdatedAt) : null
         };

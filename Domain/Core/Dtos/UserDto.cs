@@ -1,4 +1,5 @@
 ﻿using Domain.Generic;
+using System.Collections.Generic;
 
 namespace Domain.Core.Dtos
 {
@@ -8,6 +9,7 @@ namespace Domain.Core.Dtos
         public string Email { get; set; }
         public bool IsSuspended { get; set; }
         public ProfileDto Profile { get; set; }
+        public List<int> Roles { get; set; }
     }
 
     public class ProfileDto

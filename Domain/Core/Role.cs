@@ -21,13 +21,15 @@ namespace Domain.Core
             PermissionRoles = new List<PermissionRole>();
         }
 
-        public void AddPermission(Permission permission)
+        public void AddPermissions(params Permission[] permissions)
         {
             var permissionRole = new PermissionRole();
-            permissionRole.SetPermission(permission);
-            permissionRole.SetRole(this);
-
-            PermissionRoles.Add(permissionRole);
+            foreach(Permission permission in permissions)
+            {
+                permissionRole.SetPermission(permission);
+                permissionRole.SetRole(this);
+                PermissionRoles.Add(permissionRole);
+            }
         }
 
         public RoleDto ToDto() => new RoleDto() {

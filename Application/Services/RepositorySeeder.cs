@@ -34,20 +34,20 @@ namespace Application.Services
 
             var permissions = new Permission[]
             {
-                new Permission { Name = Constants.PermissionsNames.CreatePermission },
-                new Permission { Name = Constants.PermissionsNames.ViewPermission },
-                new Permission { Name = Constants.PermissionsNames.EditPermission },
-                new Permission { Name = Constants.PermissionsNames.DeletePermission },
+                new Permission { Name = Constants.PermissionNames.CreatePermission },
+                new Permission { Name = Constants.PermissionNames.ViewPermission },
+                new Permission { Name = Constants.PermissionNames.EditPermission },
+                new Permission { Name = Constants.PermissionNames.DeletePermission },
 
-                new Permission { Name = Constants.PermissionsNames.CreateRole },
-                new Permission { Name = Constants.PermissionsNames.ViewRole },
-                new Permission { Name = Constants.PermissionsNames.EditRole },
-                new Permission { Name = Constants.PermissionsNames.DeleteRole },
+                new Permission { Name = Constants.PermissionNames.CreateRole },
+                new Permission { Name = Constants.PermissionNames.ViewRole },
+                new Permission { Name = Constants.PermissionNames.EditRole },
+                new Permission { Name = Constants.PermissionNames.DeleteRole },
 
-                new Permission { Name = Constants.PermissionsNames.CreateUser },
-                new Permission { Name = Constants.PermissionsNames.ViewUser },
-                new Permission { Name = Constants.PermissionsNames.EditUser },
-                new Permission { Name = Constants.PermissionsNames.DeleteUser },
+                new Permission { Name = Constants.PermissionNames.CreateUser },
+                new Permission { Name = Constants.PermissionNames.ViewUser },
+                new Permission { Name = Constants.PermissionNames.EditUser },
+                new Permission { Name = Constants.PermissionNames.DeleteUser },
             };
 
             List<Task<Permission>> tasks = new List<Task<Permission>>();
@@ -75,7 +75,7 @@ namespace Application.Services
 
             foreach (Permission permission in permissions)
             {
-                adminRole.AddPermission(permission);
+                adminRole.AddPermissions(permission);
             }
 
             await Uow.RoleRepository.Add(adminRole);
@@ -99,7 +99,7 @@ namespace Application.Services
             };
 
             var adminRole = await Uow.RoleRepository.FindOneBy(role => role.NormalizedName == "ADMIN");
-            user.AddRole(adminRole);
+            user.AddRoles(adminRole);
 
             IdentityResult result = await UserManager.CreateAsync(user, defaultAdminPassword);
             if (!result.Succeeded)

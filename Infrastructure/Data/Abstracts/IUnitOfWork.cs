@@ -1,5 +1,6 @@
 ﻿using Domain.Core.Abstracts;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Abstracts
@@ -13,7 +14,9 @@ namespace Infrastructure.Data.Abstracts
         /// <summary>
         /// Persists changes on entities to data source
         /// </summary>
-        Task Commit();
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task Commit(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Wraps and executes the specified action within a single transaction. 

@@ -1,0 +1,36 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Admin | Roles";
+}
+
+<h1>Roles</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.RoleDtos)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>@item.CreatedAt</td>
+                        <td>
+                            <a asp-page="./Edit" asp-route-id="@item.Slug" class="btn btn-info btn-sm">EDIT</a>
+                            <a asp-page="./Delete" asp-route-id="@item.Slug" class="btn btn-danger btn-sm">DELETE</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

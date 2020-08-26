@@ -1,5 +1,5 @@
 ﻿@page
-@model Web.Pages.StatusCodeModel
+@model StatusCodeModel
 @{
     ViewData["Title"] = $"{Model.Code} {Model.Header}";
 }
@@ -34,15 +34,19 @@
     </style>
 }
 
-<div class="error">
-    <div class="error-code m-b-10 m-t-20" style="color:#900">@Model.Code</div>
-    <h3 class="font-bold"> @Model.Header</h3>
-    <div class="error-desc">
-        @Model.Description
-        <div>
-            <a class="login-detail-panel-button btn" href="@Url.Page("Index")">Home</a>
+<div class="row">
+    <div class="col-md-12">
+        <div class="error">
+            <div class="error-code m-b-10 m-t-20" style="color:#900">@Model.Code</div>
+            <h3 class="font-bold"> @Model.Header</h3>
+            <div class="error-desc">
+                @Model.Description
+                <div>
+                    <a class="login-detail-panel-button btn" href="@Url.Page("Index")">Home</a>
+                </div>
+            </div>
         </div>
-    </div>
+    </div>    
 </div>
 
 

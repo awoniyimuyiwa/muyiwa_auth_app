@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Infrastructure.Extensions;
 using System;
 using Microsoft.AspNetCore.HttpOverrides;
+using Web.Authorization;
 
 namespace Web
 {
@@ -63,6 +64,9 @@ namespace Web
                 .Build();
             });
 
+            services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>()
+                .AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+
             // X-Forwarded headers from proxy servers that should be processed when app is behind a proxy server that is not IIS
             if (string.Equals(
                 Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"),
@@ -93,15 +97,14 @@ namespace Web
             }
             else
             {
-                //app.UseExceptionHandler("/Error");
-                app.UseExceptionHandler("/StatusCode?code=500");
+                app.UseExceptionHandler("/status-code");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
 
-            app.UseStatusCodePagesWithReExecute("/StatusCode", "?code={0}");
+            app.UseStatusCodePagesWithReExecute("/status-code", "?code={0}");
 
             app.UseStaticFiles();
 

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace Web.Extensions
 {
@@ -83,11 +85,15 @@ namespace Web.Extensions
             {
                 // Cookie settings
                 options.Cookie.Name = appAuthCookieName;
-                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+                options.Cookie.SameSite = SameSiteMode.Lax;
                 options.ExpireTimeSpan = TimeSpan.FromDays(30);
 
-                options.LoginPath = "/Login";
-                options.AccessDeniedPath = "/AccessDenied";
+                options.LoginPath = "/login";
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                };
                 //options.SlidingExpiration = true;
             });
 
