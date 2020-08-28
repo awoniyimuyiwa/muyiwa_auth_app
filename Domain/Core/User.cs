@@ -17,19 +17,22 @@ namespace Domain.Core
         public virtual Profile Profile { get; set; }
 
         // M-M 
-        protected virtual List<IdentityUserRole<int>> RoleUsers { get; private set; }
-        public IReadOnlyCollection<IdentityUserRole<int>> ReadOnlyRoleUsers => RoleUsers;
+        protected virtual List<RoleUser> RoleUsers { get; private set; }
+        public IReadOnlyCollection<RoleUser> ReadOnlyRoleUsers => RoleUsers;
 
         public User() : base()
         {
-            RoleUsers = new List<IdentityUserRole<int>>();
+            RoleUsers = new List<RoleUser>();
         }
 
         public void AddRoles(params Role[] roles)
         {
             foreach(Role role in roles)
             {
-                var roleUser = new IdentityUserRole<int>() { RoleId = role.Id, UserId = Id };
+                var roleUser = new RoleUser();
+                roleUser.SetRole(role);
+                roleUser.SetUser(this);
+
                 RoleUsers.Add(roleUser);
             }
         }

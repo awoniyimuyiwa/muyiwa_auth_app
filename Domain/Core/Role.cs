@@ -35,7 +35,8 @@ namespace Domain.Core
         public RoleDto ToDto() => new RoleDto() {
             Slug = Id.ToString(),
             Name = Name,
-            Description = Description
+            Description = Description,
+            CreatedAt = Formatter.Format(CreatedAt)
         };
     }
 }

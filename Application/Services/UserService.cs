@@ -61,13 +61,6 @@ namespace Application.Services
             return Uow.Commit(cancellationToken);
         }
 
-        public Task<bool> HasPermission(
-            User user, string permissionName, CancellationToken cancellationToken = default)
-        {
-            // Todo: Call permission repository to find permission by name and where any permission role has any user with the user id
-            return Task.FromResult(true);
-        }
-
         public Task Delete(User User, CancellationToken cancellationToken = default)
         {
             UserRepository.Delete(User);

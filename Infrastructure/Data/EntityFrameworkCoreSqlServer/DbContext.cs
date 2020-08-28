@@ -1,11 +1,12 @@
 ﻿using Domain.Core;
 using Infrastructure.Data.EntityFrameworkCoreSqlServer.Mappings.Core;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.EntityFrameworkCoreSqlServer
 {
-    internal class DbContext : IdentityDbContext<User, Role, int>
+    internal class DbContext : IdentityDbContext<User, Role, int, IdentityUserClaim<int>, RoleUser, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<PermissionRole> PermissionRoles { get; set; }

@@ -11,8 +11,7 @@ namespace Application.Services
 {
     class RepositorySeeder : IRepositorySeeder
     {
-        public RepositorySeeder(
-            IUnitOfWork uow, UserManager<User> userManager)
+        public RepositorySeeder(IUnitOfWork uow, UserManager<User> userManager)
         {
             Uow = uow;
             UserManager = userManager;

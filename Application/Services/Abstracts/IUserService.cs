@@ -43,16 +43,5 @@ namespace Application.Services.Abstracts
             User user, 
             bool status = true, 
             CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="permissionName"></param>
-        /// <param name="cancellationToken"></param>
-        Task<bool> HasPermission(
-            User user, 
-            string permissionName, 
-            CancellationToken cancellationToken = default);
     }
 }

@@ -13,8 +13,8 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(maxLength: 255, nullable: false),
-                    NormalizedName = table.Column<string>(maxLength: 255, nullable: false),
+                    Name = table.Column<string>(maxLength: 256, nullable: false),
+                    NormalizedName = table.Column<string>(maxLength: 256, nullable: false),
                     Description = table.Column<string>(nullable: true),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     UpdatedAt = table.Column<DateTime>(nullable: false)

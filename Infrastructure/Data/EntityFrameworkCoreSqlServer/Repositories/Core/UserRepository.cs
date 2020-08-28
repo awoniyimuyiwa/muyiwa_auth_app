@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 {
-    class UserRepository : UserStore<User, Role, DbContext, int>, IUserRepository
+    class UserRepository : UserStore<User, Role, DbContext, int, IdentityUserClaim<int>, RoleUser, IdentityUserLogin<int>, IdentityUserToken<int>, IdentityRoleClaim<int>>, IUserRepository
     {
         readonly DbContext DbContext;
         readonly DbSet<User> DbSet;
@@ -111,6 +111,18 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
             Update(user);
         }
 
+        public async Task<bool> HasPermission(
+            int userId, string permissionName, CancellationToken cancellationToken = default)
+        {
+            IQueryable<User> queryable = DbSet;
+            int count = await queryable
+                .Where(u => u.Id == userId)
+                .Where(u => EF.Property<List<RoleUser>>(u, "RoleUsers").Any(ru => EF.Property<List<PermissionRole>>(ru.Role, "PermissionRoles").Any(pr => pr.Permission.NormalizedName == permissionName.ToUpperInvariant())))               
+                .CountAsync(cancellationToken);
+
+            return count > 0;
+        }
+
         public void Delete(User user)
         {
             if (DbContext.Entry(user).State == EntityState.Detached)
@@ -133,18 +145,6 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
             {
                 return Task.FromResult(IdentityResult.Failed(new IdentityError { Description = $"Could not delete user: {user.UserName}. {ex.Message}" }));
             }
-        }
-
-        public Task<long> Count(
-            Expression<Func<User, bool>> predicate = null,
-            CancellationToken cancellationToken = default)
-        {
-            if (predicate != null)
-            {
-                return DbSet.LongCountAsync(predicate, cancellationToken);
-            }
-
-            return DbSet.LongCountAsync(cancellationToken);
         }
 
         public Task<List<UserDto>> GetAllAsDto(
@@ -179,6 +179,18 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
             return Paginator<UserDto>.PaginateAsync(dtoQueryable, page, perPage, cancellationToken);
         }
 
+        public Task<long> Count(
+          Expression<Func<User, bool>> predicate = null,
+          CancellationToken cancellationToken = default)
+        {
+            if (predicate != null)
+            {
+                return DbSet.LongCountAsync(predicate, cancellationToken);
+            }
+
+            return DbSet.LongCountAsync(cancellationToken);
+        }
+
         public async Task<bool> IsEmpty(CancellationToken cancellationToken = default)
         {
             return !await DbSet.AnyAsync(cancellationToken);
@@ -186,7 +198,10 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 
         IQueryable<User> DoSearch(IQueryable<User> queryable, string search)
         {
-            return queryable.Where(user => EF.Functions.FreeText(user.UserName, search) || EF.Functions.FreeText(user.Email, search) || EF.Functions.FreeText(user.PhoneNumber, search));
+            search = search.ToUpperInvariant();
+            return queryable.Where(u => EF.Functions.FreeText(u.NormalizedUserName, search) 
+            || EF.Functions.FreeText(u.NormalizedEmail, search) 
+            || EF.Functions.FreeText(u.PhoneNumber, search));
         }
     }
 }

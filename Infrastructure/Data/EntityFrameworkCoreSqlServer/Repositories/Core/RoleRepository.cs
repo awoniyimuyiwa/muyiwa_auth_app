@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 {
-    class RoleRepository : RoleStore<Role, DbContext, int>, IRoleRepository
+    class RoleRepository : RoleStore<Role, DbContext, int, RoleUser, IdentityRoleClaim<int>>, IRoleRepository
     {
         readonly DbContext DbContext;
         readonly DbSet<Role> DbSet;
@@ -174,7 +174,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 
         IQueryable<Role> DoSearch(IQueryable<Role> queryable, string search)
         {
-            return queryable.Where(role => EF.Functions.FreeText(role.Name, search));
+            return queryable.Where(r => EF.Functions.FreeText(r.NormalizedName, search.ToUpperInvariant()));
         }
     }
 }

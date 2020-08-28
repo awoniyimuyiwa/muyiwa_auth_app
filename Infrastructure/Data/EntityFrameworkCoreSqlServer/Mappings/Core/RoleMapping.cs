@@ -14,8 +14,17 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Mappings.Core
             entityTypeBuilder.Property(e => e.NormalizedName).IsRequired();
             entityTypeBuilder.Property(e => e.CreatedAt).IsRequired();
             entityTypeBuilder.Property(e => e.UpdatedAt).IsRequired();
-
             entityTypeBuilder.Ignore(e => e.ReadOnlyPermissionRoles);
+
+            entityTypeBuilder.HasMany(typeof(RoleUser))
+               .WithOne("Role")
+               .HasForeignKey("RoleId")
+               .IsRequired();
+
+            entityTypeBuilder.HasMany(typeof(PermissionRole), "PermissionRoles")
+               .WithOne("Role")
+               .HasForeignKey("RoleId")
+               .IsRequired();
         }
     }
 }

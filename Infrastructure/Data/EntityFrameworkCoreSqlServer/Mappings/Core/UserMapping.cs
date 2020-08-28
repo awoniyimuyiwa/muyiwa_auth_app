@@ -1,8 +1,6 @@
 ﻿using Domain.Core;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Collections.Generic;
 
 namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Mappings.Core
 {
@@ -36,8 +34,8 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Mappings.Core
                 profileTypeBuilder.ToTable("Profiles");
             });
 
-            entityTypeBuilder.HasMany(typeof(IdentityUserRole<int>), "RoleUsers")
-               .WithOne()
+            entityTypeBuilder.HasMany(typeof(RoleUser), "RoleUsers")
+               .WithOne("User")
                .HasForeignKey("UserId")
                .IsRequired();
         }

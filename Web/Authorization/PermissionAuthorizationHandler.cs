@@ -2,6 +2,8 @@
 using Domain.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Web.Authorization
@@ -22,8 +24,9 @@ namespace Web.Authorization
         {
             if (context.User == null) { return; }
 
-            var user = await UserManager.GetUserAsync(context.User);
-            if (await UserService.HasPermission(user, requirement.PermissionName))
+            //var user = await UserManager.GetUserAsync(context.User);
+            var userId = int.Parse(context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (await UserService.UserRepository.HasPermission(userId, requirement.PermissionName))
             {
                 context.Succeed(requirement);
             }

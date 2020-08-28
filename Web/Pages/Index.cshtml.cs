@@ -17,7 +17,6 @@ namespace Web.Pages
 
         public void OnGet()
         {
-            throw new ArgumentException();
         }
     }
 }
