@@ -43,6 +43,9 @@ namespace Application.Services
                 new Permission { Name = Constants.PermissionNames.EditRole },
                 new Permission { Name = Constants.PermissionNames.DeleteRole },
 
+                // Permissions for admin operations on todo-item microservice
+                new Permission { Name = Constants.PermissionNames.ViewTodoItem },
+
                 new Permission { Name = Constants.PermissionNames.CreateUser },
                 new Permission { Name = Constants.PermissionNames.ViewUser },
                 new Permission { Name = Constants.PermissionNames.EditUser },

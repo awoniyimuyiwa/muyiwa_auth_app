@@ -25,14 +25,16 @@ namespace Web.Authorization
         /// <returns></returns>
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
-            if (policyName.StartsWith("View", StringComparison.OrdinalIgnoreCase) ||
-                policyName.StartsWith("Create", StringComparison.OrdinalIgnoreCase) ||
+            if (policyName.StartsWith("Create", StringComparison.OrdinalIgnoreCase) ||
+                policyName.StartsWith("Delete", StringComparison.OrdinalIgnoreCase) ||
                 policyName.StartsWith("Edit", StringComparison.OrdinalIgnoreCase) ||
-                policyName.StartsWith("Delete", StringComparison.OrdinalIgnoreCase))
+                policyName.StartsWith("View", StringComparison.OrdinalIgnoreCase))
             {
-                var policy = new AuthorizationPolicyBuilder();
-                policy.AddRequirements(new PermissionRequirement(policyName));
-                return Task.FromResult(policy.Build());
+                var policyBuilder = new AuthorizationPolicyBuilder();
+                policyBuilder.RequireAuthenticatedUser();
+                policyBuilder.AddRequirements(new PermissionRequirement(policyName));
+
+                return Task.FromResult(policyBuilder.Build());
             }
 
             return FallbackPolicyProvider.GetPolicyAsync(policyName);

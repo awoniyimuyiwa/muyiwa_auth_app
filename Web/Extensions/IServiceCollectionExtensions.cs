@@ -40,9 +40,9 @@ namespace Web.Extensions
                 // This lambda determines whether user consent for non-essential 
                 // cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.None;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
-                options.Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+                options.Secure = CookieSecurePolicy.Always;
             });
 
             return services;
@@ -89,9 +89,11 @@ namespace Web.Extensions
                 options.ExpireTimeSpan = TimeSpan.FromDays(30);
 
                 options.LoginPath = "/login";
-                options.Events.OnRedirectToAccessDenied = context =>
+                options.LogoutPath = "/logout";
+
+                options.Events.OnRedirectToAccessDenied = redirectContext =>
                 {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    redirectContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                     return Task.CompletedTask;
                 };
                 //options.SlidingExpiration = true;

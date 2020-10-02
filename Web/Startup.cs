@@ -13,6 +13,7 @@ using Infrastructure.Extensions;
 using System;
 using Microsoft.AspNetCore.HttpOverrides;
 using Web.Authorization;
+using Web.Utils;
 
 namespace Web
 {
@@ -34,7 +35,6 @@ namespace Web
             services.AddIdentity<Domain.Core.User, Domain.Core.Role>()
                 .AddInfrastructureIdentityStores()
                 .AddDefaultTokenProviders();
-            //.AddDefaultUI();
 
             services.AddInfrastructureIdentityServices();
 
@@ -45,7 +45,7 @@ namespace Web
                 .AddFacebook(options => {
                     options.AppId = Configuration.GetValue<string>("AppFacebookAppId");
                     options.AppSecret = Configuration.GetValue<string>("AppFacebookAppSecret");
-                    options.AccessDeniedPath = "/Login";
+                    options.AccessDeniedPath = "/login";
                 })
                 .AddGoogle(options => {
                     options.ClientId = Configuration.GetValue<string>("AppGoogleClientId");
@@ -66,6 +66,20 @@ namespace Web
 
             services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>()
                 .AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+
+            var identityServerBuilder = services.AddIdentityServer()
+                .AddInMemoryIdentityResources(IdentityServerConfig.IdentityResources())
+                .AddInMemoryApiScopes(IdentityServerConfig.ApiScopes())
+                .AddInMemoryApiResources(IdentityServerConfig.ApiResources())
+                .AddInMemoryClients(IdentityServerConfig.Clients(Configuration));
+
+            if (string.Equals(
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+                "Development", StringComparison.OrdinalIgnoreCase))
+            {
+                // Not recommended for production - you need to store your key material somewhere secure
+                identityServerBuilder.AddDeveloperSigningCredential();
+            }
 
             // X-Forwarded headers from proxy servers that should be processed when app is behind a proxy server that is not IIS
             if (string.Equals(
@@ -92,33 +106,27 @@ namespace Web
 
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
-                app.UseInfrastructureDatabaseErrorPage();
+                app.UseDeveloperExceptionPage()
+                    .UseInfrastructureDatabaseErrorPage();
             }
             else
             {
-                app.UseExceptionHandler("/status-code");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                app.UseExceptionHandler("/status-code")
+                    .UseHsts(); // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             }
 
-            app.UseHttpsRedirection();
-
-            app.UseStatusCodePagesWithReExecute("/status-code", "?code={0}");
-
-            app.UseStaticFiles();
-
-            app.UseCookiePolicy();
-
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapRazorPages();
-            });
+            app.UseHttpsRedirection()
+                .UseStatusCodePagesWithReExecute("/status-code", "?code={0}")
+                .UseStaticFiles()
+                .UseCookiePolicy()
+                .UseAuthentication()
+                .UseRouting()
+                .UseIdentityServer()
+                .UseAuthorization()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapRazorPages();
+                });
         }
     }
 }
