@@ -21,7 +21,7 @@ $ dotnet ef database update --startup-project ../Web/Web.csproj  --context  DbCo
 $ dotnet ef database update --startup-project ../Web/Web.csproj  --context  PersistedGrantDbContext
 $ dotnet ef database update --startup-project ../Web/Web.csproj  --context  ConfigurationDbContext
 
-# serve at http://localhost:5000 and https://localhost:500
+# serve at http://localhost:5000 and https://localhost:5001
 $ dotnet run --project ../Web/Web.csproj
 ```
 
