@@ -1,6 +1,6 @@
 # Auth Micoservice
 
-> Authorization server built with ASP.NET core using ASP.NET Identity and IdentityServer4
+> Authorization server built on ASP.NET Identity and IdentityServer4
 * Has permission based authorizaation.
 * Integrated with Entity Framework
 * Has api endpoints with cookie authentication and csrf protection for SPAs.
@@ -31,9 +31,8 @@ $ dotnet run --project ../Web/Web.csproj
 
 
 ### In Progress ###
-* Integrate consent UI where users can grant consent to third party clients
-* Add API endpoints for admin to mange users, roles, permissions, api clients, resources and scopes
-* Add API endpoints for users to manage profile information
+* Add admin API endpoints for manging users, roles, permissions, api clients, resources and scopes.
+* Add API endpoints for users to manage their profile.
 
 
 ### Who do I talk to? ###

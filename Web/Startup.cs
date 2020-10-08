@@ -52,6 +52,8 @@ namespace Web
                 .AddRazorPages(options => {
                     options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
                 });
+                
+                services.AddControllersWithViews();
 
             if (string.Equals(
                 Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"),
@@ -110,6 +112,7 @@ namespace Web
                 .UseEndpoints(endpoints =>
                 {
                     endpoints.MapRazorPages();
+                    endpoints.MapControllers();
                 });
         }
     }

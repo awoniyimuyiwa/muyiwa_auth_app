@@ -2,7 +2,17 @@
 {
     internal static class Constants
     {
-        internal static class CustomIdentityServerScopes
+        internal class ConsentOptions
+        {
+            public static bool EnableOfflineAccess = true;
+            public static string OfflineAccessDisplayName = "Offline Access";
+            public static string OfflineAccessDescription = "Access to your applications and resources, even when you are offline";
+
+            public static readonly string MustChooseOneErrorMessage = "You must pick at least one permission";
+            public static readonly string InvalidSelectionErrorMessage = "Invalid selection";
+        }
+
+        internal class CustomIdentityServerScopes
         {
             // Identity resource scopes
             internal const string Permission = "permission";
@@ -14,7 +24,7 @@
             internal const string WriteTodoItem = "write.todoitem";
         }
 
-        internal static class PermissionNames
+        internal class PermissionNames
         {
             // Permission
             public const string CreatePermission = "Create Permission";
