@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Application;
 using Application.Services.Abstracts;
 using Domain.Core.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
+using Web.Utils;
 
 namespace Web.Pages.Admin.Roles
 {
@@ -15,10 +16,14 @@ namespace Web.Pages.Admin.Roles
     public class CreateModel : PageModel
     {
         readonly IRoleService RoleService;
+        readonly IStringLocalizer<Status> StatusMessageLocalizer;
 
-        public CreateModel(IRoleService roleService)
+        public CreateModel(
+            IRoleService roleService,
+            IStringLocalizer<Status> statusMessageLocalizer)
         {
             RoleService = roleService;
+            StatusMessageLocalizer = statusMessageLocalizer;
         }
 
         public List<PermissionDto> PermissionDtos { get; private set; }
@@ -67,7 +72,7 @@ namespace Web.Pages.Admin.Roles
             }
                 
             await RoleService.Create(Input.ToDto());
-            TempData["Status"] = "Role successfully created!";
+            TempData["Status"] = StatusMessageLocalizer["RoleCreated"];
 
             return RedirectToPage("/admin/roles");
         }

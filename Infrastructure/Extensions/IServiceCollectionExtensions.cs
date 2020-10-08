@@ -4,6 +4,7 @@ using Domain.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using IdentityServer4.Stores;
 
 namespace Infrastructure.Extensions
 {
@@ -20,6 +21,7 @@ namespace Infrastructure.Extensions
 
             // One instance of UnitOfWork per request
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IIdentityServerConfigurationUnitOfWork, IdentityServerConfigurationUnitOfWork>();
 
             return services;
         }
@@ -30,12 +32,27 @@ namespace Infrastructure.Extensions
             {
                 var uow = serviceProvider.GetRequiredService<IUnitOfWork>();
                 return uow.UserRepository;
-            });
-
-            services.AddTransient<IRoleStore<Role>>(serviceProvider =>
+            })
+            .AddTransient<IRoleStore<Role>>(serviceProvider =>
             {
                 var uow = serviceProvider.GetRequiredService<IUnitOfWork>();
                 return uow.RoleRepository;
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddInfrastructureIdentityServerServices(this IServiceCollection services)
+        {
+            services.AddTransient<IClientStore>(serviceProvider =>
+            {
+                var uow = serviceProvider.GetRequiredService<IIdentityServerConfigurationUnitOfWork>();
+                return uow.CustomClientStore;
+            })
+            .AddTransient<IResourceStore>(serviceProvider =>
+            {
+                var uow = serviceProvider.GetRequiredService<IIdentityServerConfigurationUnitOfWork>();
+                return uow.CustomResourceStore;
             });
 
             return services;

@@ -12,6 +12,10 @@ namespace Domain.Core
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
 
+        // M-M between Role and User
+        // Declared just to make querying easier
+        protected virtual List<RoleUser> RoleUsers { get; set; }
+
         // M-M between Role and Permission
         protected virtual List<PermissionRole> PermissionRoles { get; set; }
         public IReadOnlyCollection<PermissionRole> ReadOnlyPermissionRoles => PermissionRoles;

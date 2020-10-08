@@ -16,7 +16,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Mappings.Core
             entityTypeBuilder.Property(e => e.UpdatedAt).IsRequired();
             entityTypeBuilder.Ignore(e => e.ReadOnlyPermissionRoles);
 
-            entityTypeBuilder.HasMany(typeof(RoleUser))
+            entityTypeBuilder.HasMany(typeof(RoleUser), "RoleUsers")
                .WithOne("Role")
                .HasForeignKey("RoleId")
                .IsRequired();

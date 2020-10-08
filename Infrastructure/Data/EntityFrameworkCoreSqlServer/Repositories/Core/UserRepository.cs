@@ -61,7 +61,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 
             queryable = queryable.Where(u => u.Id == id).Include(u => u.Profile);
 
-            return queryable.FirstAsync(cancellationToken);
+            return queryable.FirstOrDefaultAsync(cancellationToken);
         }
 
         public Task<User> FindOneBy(
@@ -72,7 +72,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 
             queryable = queryable.Where(predicate).Include(u => u.Profile);
 
-            return queryable.FirstAsync(cancellationToken);
+            return queryable.FirstOrDefaultAsync(cancellationToken);
         }
 
         public void Update(User user)
@@ -109,18 +109,6 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
         {
             DbContext.Entry(user).Property(user => user.IsSuspended).CurrentValue = status;
             Update(user);
-        }
-
-        public async Task<bool> HasPermission(
-            int userId, string permissionName, CancellationToken cancellationToken = default)
-        {
-            IQueryable<User> queryable = DbSet;
-            int count = await queryable
-                .Where(u => u.Id == userId)
-                .Where(u => EF.Property<List<RoleUser>>(u, "RoleUsers").Any(ru => EF.Property<List<PermissionRole>>(ru.Role, "PermissionRoles").Any(pr => pr.Permission.NormalizedName == permissionName.ToUpperInvariant())))               
-                .CountAsync(cancellationToken);
-
-            return count > 0;
         }
 
         public void Delete(User user)

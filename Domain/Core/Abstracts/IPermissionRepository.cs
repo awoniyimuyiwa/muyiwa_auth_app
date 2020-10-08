@@ -26,5 +26,24 @@ namespace Domain.Core.Abstracts
            Expression<Func<Permission, bool>> predicate = null,
            CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Get permissions for a user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<List<PermissionDto>> GetAllForUserAsDto(
+            int userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Check if a user has a permission
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permissionName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public Task<bool> HasPermission(
+            int userId, string permissionName, CancellationToken cancellationToken = default);
+
     }
 }

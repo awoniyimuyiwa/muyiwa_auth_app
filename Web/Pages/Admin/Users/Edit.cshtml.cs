@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Application;
 using Application.Services.Abstracts;
 using Domain.Core;
 using Domain.Core.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
+using Web.Utils;
 
 namespace Web.Pages.Admin.Users
 {
@@ -16,10 +17,14 @@ namespace Web.Pages.Admin.Users
     public class EditModel : PageModel
     {
         readonly IUserService UserService;
+        readonly IStringLocalizer<Status> StatusMessageLocalizer;
 
-        public EditModel(IUserService userService)
+        public EditModel(
+            IUserService userService,
+            IStringLocalizer<Status> statusMessageLocalizer)
         {
             UserService = userService;
+            StatusMessageLocalizer = statusMessageLocalizer;
         }
 
         public User UserToEdit { get; private set; }
@@ -72,7 +77,7 @@ namespace Web.Pages.Admin.Users
             }
 
             await UserService.Update(UserToEdit, Input.ToDto());
-            TempData["Status"] = "User successfully updated!";
+            TempData["Status"] = StatusMessageLocalizer["RoleUpdated"];
 
             return RedirectToPage("/admin/users");
         }

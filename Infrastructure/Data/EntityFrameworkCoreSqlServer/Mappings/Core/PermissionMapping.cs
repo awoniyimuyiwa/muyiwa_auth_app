@@ -14,7 +14,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Mappings.Core
 
             entityTypeBuilder.HasIndex(e => e.NormalizedName).IsUnique();
 
-            entityTypeBuilder.HasMany(typeof(PermissionRole))
+            entityTypeBuilder.HasMany(typeof(PermissionRole), "PermissionRoles")
               .WithOne("Permission")
               .HasForeignKey("PermissionId")
               .IsRequired();

@@ -1,6 +1,7 @@
 ﻿using Domain.Core.Abstracts;
 using Infrastructure.Data.Abstracts;
 using Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core;
+using Infrastructure.Data.Exceptions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

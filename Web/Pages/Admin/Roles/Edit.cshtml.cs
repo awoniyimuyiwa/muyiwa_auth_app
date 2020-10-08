@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Application;
 using Application.Services.Abstracts;
 using Domain.Core;
 using Domain.Core.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
+using Web.Utils;
 
 namespace Web.Pages.Admin.Roles
 {
@@ -15,10 +16,14 @@ namespace Web.Pages.Admin.Roles
     public class EditModel : PageModel
     {
         readonly IRoleService RoleService;
+        readonly IStringLocalizer<Status> StatusMessageLocalizer;
 
-        public EditModel(IRoleService roleService)
+        public EditModel(
+            IRoleService roleService,
+            IStringLocalizer<Status> statusMessageLocalizer)
         {
             RoleService = roleService;
+            StatusMessageLocalizer = statusMessageLocalizer;
         }
 
         public Role RoleToEdit { get; private set; }
@@ -59,7 +64,7 @@ namespace Web.Pages.Admin.Roles
             }
 
             await RoleService.Update(RoleToEdit, Input.ToDto());
-            TempData["Status"] = "Role successfully updated!";
+            TempData["Status"] = StatusMessageLocalizer["RoleUpdated"];
 
             return RedirectToPage("/admin/roles");
         }

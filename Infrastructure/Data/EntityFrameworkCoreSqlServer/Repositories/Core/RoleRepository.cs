@@ -60,7 +60,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 
             queryable = queryable.Where(u => u.Id == id);
 
-            return queryable.FirstAsync(cancellationToken);
+            return queryable.FirstOrDefaultAsync(cancellationToken);
         }
 
         public Task<Role> FindOneBy(
@@ -71,7 +71,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 
             queryable = queryable.Where(predicate);
 
-            return queryable.FirstAsync(cancellationToken);
+            return queryable.FirstOrDefaultAsync(cancellationToken);
         }
 
         public void Update(Role role)

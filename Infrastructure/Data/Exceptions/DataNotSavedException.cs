@@ -1,8 +1,7 @@
-﻿using Domain.Core;
-using Domain.Generic;
+﻿using Domain.Generic;
 using System;
 
-namespace Infrastructure.Data
+namespace Infrastructure.Data.Exceptions
 {
     class DataNotSavedException : BaseException
     {

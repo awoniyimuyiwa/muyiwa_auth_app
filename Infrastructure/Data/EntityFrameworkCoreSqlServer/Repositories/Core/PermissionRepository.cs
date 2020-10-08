@@ -41,7 +41,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 
             queryable = queryable.Where(u => u.Id == id);
 
-            return queryable.FirstAsync(cancellationToken);
+            return queryable.FirstOrDefaultAsync(cancellationToken);
         }
 
         public Task<Permission> FindOneBy(
@@ -52,7 +52,7 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
 
             queryable = queryable.Where(predicate);
 
-            return queryable.FirstAsync(cancellationToken);
+            return queryable.FirstOrDefaultAsync(cancellationToken);
         }
 
         public void Update(Permission permission)
@@ -86,18 +86,6 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
             }
 
             return DbSet.LongCountAsync(cancellationToken);
-        }
-
-        public Task<List<Permission>> GetAll(
-            Func<IQueryable<Permission>, IOrderedQueryable<Permission>> orderBy = null,
-            Expression<Func<Permission, bool>> predicate = null,
-            CancellationToken cancellationToken = default)
-        {
-            IQueryable<Permission> queryable = DbSet;
-            queryable = (predicate != null) ? queryable.Where(predicate) : queryable;
-            queryable = (orderBy != null) ? orderBy(queryable) : queryable;
-
-            return queryable.ToListAsync(cancellationToken);
         }
 
         public Task<List<PermissionDto>> GetAllAsDto(
@@ -135,6 +123,43 @@ namespace Infrastructure.Data.EntityFrameworkCoreSqlServer.Repositories.Core
         public async Task<bool> IsEmpty(CancellationToken cancellationToken = default)
         {
             return !await DbSet.AnyAsync(cancellationToken);
+        }
+
+        public Task<List<Permission>> GetAll(
+            Func<IQueryable<Permission>, IOrderedQueryable<Permission>> orderBy = null,
+            Expression<Func<Permission, bool>> predicate = null,
+            CancellationToken cancellationToken = default)
+        {
+            IQueryable<Permission> queryable = DbSet;
+            queryable = (predicate != null) ? queryable.Where(predicate) : queryable;
+            queryable = (orderBy != null) ? orderBy(queryable) : queryable;
+
+            return queryable.ToListAsync(cancellationToken);
+        }
+
+        public Task<List<PermissionDto>> GetAllForUserAsDto(
+           int userId, CancellationToken cancellationToken = default)
+        {
+            IQueryable<Permission> queryable = DbSet;
+
+            var dtoQuery = queryable.Where(p => EF.Property<List<PermissionRole>>(p, "PermissionRoles").Any(pr => EF.Property<List<RoleUser>>(pr.Role, "RoleUsers").Any(ru => ru.UserId == userId)))
+                .Select(p => p.ToDto())
+                .AsNoTracking();
+
+            return dtoQuery.ToListAsync(cancellationToken);
+        }
+
+        public async Task<bool> HasPermission(
+           int userId, string permissionName, CancellationToken cancellationToken = default)
+        {
+            IQueryable<Permission> queryable = DbSet;
+
+            int count = await queryable
+                  .Where(p => p.NormalizedName == permissionName.ToUpperInvariant())
+                  .Where(p => EF.Property<List<PermissionRole>>(p, "PermissionRoles").Any(pr => EF.Property<List<RoleUser>>(pr.Role, "RoleUsers").Any(ru => ru.UserId == userId)))
+                  .CountAsync(cancellationToken);
+
+            return count > 0;
         }
 
         /// <summary>

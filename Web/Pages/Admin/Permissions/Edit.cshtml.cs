@@ -1,10 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Application;
 using Application.Services.Abstracts;
 using Domain.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
+using Web.Utils;
 
 namespace Web.Pages.Admin.Permissions
 {
@@ -13,10 +14,14 @@ namespace Web.Pages.Admin.Permissions
     public class EditModel : PageModel
     {
         readonly IPermissionService PermissionService;
+        readonly IStringLocalizer<Status> StatusMessageLocalizer;
 
-        public EditModel(IPermissionService permissionService)
+        public EditModel(
+            IPermissionService permissionService,
+            IStringLocalizer<Status> statusMessageLocalizer)
         {
             PermissionService = permissionService;
+            StatusMessageLocalizer = statusMessageLocalizer;
         }
 
         public Permission PermissionToEdit { get; private set; }
@@ -50,7 +55,7 @@ namespace Web.Pages.Admin.Permissions
             if (!ModelState.IsValid) { return Page(); }
 
             await PermissionService.Update(PermissionToEdit, Input.ToDto());
-            TempData["Status"] = "Permission successfully updated!";
+            TempData["Status"] = StatusMessageLocalizer["PermissionUpdated"];
 
             return RedirectToPage("/admin/permissions");
         }

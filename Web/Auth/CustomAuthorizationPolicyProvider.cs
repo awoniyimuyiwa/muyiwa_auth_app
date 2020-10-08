@@ -3,13 +3,13 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 
-namespace Web.Authorization
+namespace Web.Auth
 {
-    public class PermissionPolicyProvider : IAuthorizationPolicyProvider
+    class CustomAuthorizationPolicyProvider : IAuthorizationPolicyProvider
     {
         readonly DefaultAuthorizationPolicyProvider FallbackPolicyProvider;
 
-        public PermissionPolicyProvider(IOptions<AuthorizationOptions> options)
+        public CustomAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options)
         {
             FallbackPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
         }
@@ -25,14 +25,25 @@ namespace Web.Authorization
         /// <returns></returns>
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
-            if (policyName.StartsWith("Create", StringComparison.OrdinalIgnoreCase) ||
-                policyName.StartsWith("Delete", StringComparison.OrdinalIgnoreCase) ||
-                policyName.StartsWith("Edit", StringComparison.OrdinalIgnoreCase) ||
-                policyName.StartsWith("View", StringComparison.OrdinalIgnoreCase))
+            if (policyName.StartsWith("Create") ||
+                policyName.StartsWith("Delete") ||
+                policyName.StartsWith("Edit") ||
+                policyName.StartsWith("View"))
             {
                 var policyBuilder = new AuthorizationPolicyBuilder();
                 policyBuilder.RequireAuthenticatedUser();
                 policyBuilder.AddRequirements(new PermissionRequirement(policyName));
+
+                return Task.FromResult(policyBuilder.Build());
+            } 
+            else if (policyName.StartsWith("delete.") ||
+              policyName.StartsWith("read.") ||
+              policyName.StartsWith("worker.") ||
+              policyName.StartsWith("write."))
+            {
+                var policyBuilder = new AuthorizationPolicyBuilder();
+                policyBuilder.RequireAuthenticatedUser();
+                policyBuilder.AddRequirements(new ScopeRequirement(policyName));
 
                 return Task.FromResult(policyBuilder.Build());
             }

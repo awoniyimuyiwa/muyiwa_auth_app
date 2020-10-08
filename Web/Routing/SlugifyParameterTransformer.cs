@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Web.Routing
 {
-    public class SlugifyParameterTransformer : IOutboundParameterTransformer
+    class SlugifyParameterTransformer : IOutboundParameterTransformer
     {
         public string TransformOutbound(object value)
         {

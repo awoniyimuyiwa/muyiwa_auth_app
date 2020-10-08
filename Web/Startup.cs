@@ -8,12 +8,11 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Web.Routing;
 using Web.Extensions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
 using Infrastructure.Extensions;
 using System;
 using Microsoft.AspNetCore.HttpOverrides;
-using Web.Authorization;
-using Web.Utils;
+using Microsoft.Extensions.Options;
+using Web.Auth;
 
 namespace Web
 {
@@ -29,63 +28,36 @@ namespace Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddInfrastructureServices(Configuration.GetConnectionString("DefaultConnection"));
-            services.AddApplicationServices();
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-            services.AddIdentity<Domain.Core.User, Domain.Core.Role>()
-                .AddInfrastructureIdentityStores()
-                .AddDefaultTokenProviders();
+            services.AddInfrastructureServices(connectionString)                
+                .AddCustomIdentity()
+                .AddClaimsPrincipalFactory<CustomUserClaimsPrincipalFactory>()
+                .AddDefaultTokenProviders()
+                .AddInfrastructureIdentityStores();
 
-            services.AddInfrastructureIdentityServices();
+            services.AddInfrastructureIdentityServices()
+                .AddCustomIdentityServer()
+                .AddInfrastructureIdentityServerStores(connectionString);
 
-            services.AddCookieOptions()
-                .AddIdentityOptions(Configuration.GetValue<string>("AppAuthCookieName"))
-                .AddEmailSender(Configuration)
-                .AddAuthentication()
-                .AddFacebook(options => {
-                    options.AppId = Configuration.GetValue<string>("AppFacebookAppId");
-                    options.AppSecret = Configuration.GetValue<string>("AppFacebookAppSecret");
-                    options.AccessDeniedPath = "/login";
-                })
-                .AddGoogle(options => {
-                    options.ClientId = Configuration.GetValue<string>("AppGoogleClientId");
-                    options.ClientSecret = Configuration.GetValue<string>("AppGoogleClientSecret");
+            services.AddInfrastructureIdentityServerServices()
+                .AddApplicationServices()
+                .AddWebServices()
+                .AddCustomEmailSender(Configuration)
+                .AddCustomAuthentication(Configuration)
+                .AddCustomAuthorization()
+                .AddCustomCookieOptions()
+                .ConfigureCustomApplicationCookie(Configuration.GetValue<string>("AppAuthCookieName"))
+                .AddCustomLocalization(Configuration.GetValue<string>("AppUserCultureCookieName"))
+                .AddRazorPages(options => {
+                    options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
                 });
 
-            services.AddRazorPages(options => {
-                options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
-            });
-
-            // Configure authentication to be required thoroughout except for pages, controllers or actions with [AllowAnonymous] attribute
-            services.AddAuthorization(options =>
-            {
-                options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-            });
-
-            services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>()
-                .AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-
-            var identityServerBuilder = services.AddIdentityServer()
-                .AddInMemoryIdentityResources(IdentityServerConfig.IdentityResources())
-                .AddInMemoryApiScopes(IdentityServerConfig.ApiScopes())
-                .AddInMemoryApiResources(IdentityServerConfig.ApiResources())
-                .AddInMemoryClients(IdentityServerConfig.Clients(Configuration));
-
-            if (string.Equals(
-                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
-                "Development", StringComparison.OrdinalIgnoreCase))
-            {
-                // Not recommended for production - you need to store your key material somewhere secure
-                identityServerBuilder.AddDeveloperSigningCredential();
-            }
-
-            // X-Forwarded headers from proxy servers that should be processed when app is behind a proxy server that is not IIS
             if (string.Equals(
                 Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"),
                 "true", StringComparison.OrdinalIgnoreCase))
             {
+                // X-Forwarded headers from proxy servers that should be processed when app is behind a proxy server that is not IIS
                 services.Configure<ForwardedHeadersOptions>(options =>
                 {
                     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
@@ -102,26 +74,38 @@ namespace Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseForwardedHeaders();
+            app.UseForwardedHeaders()
+               .UseHttpsRedirection()
+               .UseHsts() // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+               .UseCookiePolicy()
+               .UseRequestLocalization(app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage()
-                    .UseInfrastructureDatabaseErrorPage();
-            }
+                app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+                {
+                    appBuilder.UseDeveloperExceptionPage()
+                    .UseInfrastructureDatabaseErrorPage()
+                    .UseStatusCodePagesWithReExecute("/status-code", "?code={0}");
+                });
+            } 
             else
             {
-                app.UseExceptionHandler("/status-code")
-                    .UseHsts(); // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+                {
+                    appBuilder.UseExceptionHandler("/status-code")
+                    .UseStatusCodePagesWithReExecute("/status-code", "?code={0}");
+                });
             }
 
-            app.UseHttpsRedirection()
-                .UseStatusCodePagesWithReExecute("/status-code", "?code={0}")
-                .UseStaticFiles()
-                .UseCookiePolicy()
-                .UseAuthentication()
+            app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+            {
+                appBuilder.UseCustomApiExceptionHandler();
+            });
+      
+            app.UseStaticFiles()
                 .UseRouting()
-                .UseIdentityServer()
+                .UseIdentityServer() // calls UseAuthentication, so no need for UseAuthentication()
                 .UseAuthorization()
                 .UseEndpoints(endpoints =>
                 {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using System.Linq;
+using Web.MiddleWares;
 
 namespace Web.Extensions
 {
@@ -8,24 +8,16 @@ namespace Web.Extensions
     /// </summary>
     public static class IApplicationBuilderExtensions
     {
-       
         /// <summary>
-        /// Set up localization for the app
+        ///  Set up global exception handling for /api endpoints using a middleware
         /// </summary>
         /// <param name="appBuilder"></param>
-        /// <param name="cultureCookieName"></param>
-        public static void UseCustomLocalization(this IApplicationBuilder appBuilder, string cultureCookieName)
+        /// <returns></returns>
+        public static IApplicationBuilder UseCustomApiExceptionHandler(this IApplicationBuilder appBuilder)
         {
-            var supportedCultures = new[] { "en" };
+            appBuilder.UseMiddleware<ApiExceptionHandlerMiddleware>();
 
-            var localizationOptions = new RequestLocalizationOptions()
-                .SetDefaultCulture(supportedCultures[0])
-                .AddSupportedCultures(supportedCultures)
-                .AddSupportedUICultures(supportedCultures);
-           
-            localizationOptions.RequestCultureProviders.OfType<Microsoft.AspNetCore.Localization.CookieRequestCultureProvider>().First().CookieName = cultureCookieName;
-
-            appBuilder.UseRequestLocalization(localizationOptions);
+            return appBuilder;
         }
     }
 }
