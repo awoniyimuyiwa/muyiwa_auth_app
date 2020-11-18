@@ -43,8 +43,8 @@ namespace Domain.Core
             UserName = UserName,
             Email = Email,
             IsSuspended = IsSuspended,
-            CreatedAt = CreatedAt != null ? Formatter.Format(CreatedAt) : null,
-            UpdatedAt = UpdatedAt != null ? Formatter.Format(UpdatedAt) : null
+            CreatedAt = Formatter.Format(CreatedAt),
+            UpdatedAt = Formatter.Format(UpdatedAt)
         };
     }
 
@@ -70,7 +70,7 @@ namespace Domain.Core
             FirstName = FirstName,
             LastName = LastName,
             Gender = gender,
-            DateOfBirth = DateOfBirth != null ? Formatter.Format(DateOfBirth) : null
+            DateOfBirth = Formatter.Format(DateOfBirth)
         };
     }
 

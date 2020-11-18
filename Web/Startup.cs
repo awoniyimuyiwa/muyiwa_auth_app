@@ -52,9 +52,9 @@ namespace Web
                 .AddRazorPages(options => {
                     options.Conventions.Add(new PageRouteTransformerConvention(new SlugifyParameterTransformer()));
                 });
-                
-                services.AddControllersWithViews();
 
+            services.AddControllersWithViews();
+                
             if (string.Equals(
                 Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"),
                 "true", StringComparison.OrdinalIgnoreCase))
@@ -65,8 +65,7 @@ namespace Web
                     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
                         ForwardedHeaders.XForwardedProto;
                     // Only loopback proxies are allowed by default.
-                    // Clear that restriction because forwarders are enabled by explicit 
-                    // configuration.
+                    // Clear that restriction because forwarders are enabled by explicit configuration.
                     options.KnownNetworks.Clear();
                     options.KnownProxies.Clear();
                 });
@@ -77,8 +76,6 @@ namespace Web
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseForwardedHeaders()
-               .UseHttpsRedirection()
-               .UseHsts() // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                .UseCookiePolicy()
                .UseRequestLocalization(app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 
@@ -87,17 +84,20 @@ namespace Web
                 app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), appBuilder =>
                 {
                     appBuilder.UseDeveloperExceptionPage()
-                    .UseInfrastructureDatabaseErrorPage()
+                    .UseInfrastructureMigrationsEndPoint()
                     .UseStatusCodePagesWithReExecute("/status-code", "?code={0}");
                 });
             } 
             else
             {
-                app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), appBuilder =>
-                {
-                    appBuilder.UseExceptionHandler("/status-code")
-                    .UseStatusCodePagesWithReExecute("/status-code", "?code={0}");
-                });
+                // Use HTTP Strict Transport Security (HSTS) headers in response to browsers to tell them to only send requests over https. 
+                // The default value of MaxAge is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts()
+                    .UseWhen(context => !context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+                    {
+                        appBuilder.UseExceptionHandler("/status-code")
+                        .UseStatusCodePagesWithReExecute("/status-code", "?code={0}");
+                    });
             }
 
             app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
@@ -105,9 +105,11 @@ namespace Web
                 appBuilder.UseCustomApiExceptionHandler();
             });
       
-            app.UseStaticFiles()
+            app.UseHttpsRedirection()
+                .UseStaticFiles()
                 .UseRouting()
-                .UseIdentityServer() // calls UseAuthentication, so no need for UseAuthentication()
+                // UseIdentityServer calls UseAuthentication so no need for UseAuthentication again
+                .UseIdentityServer()                 
                 .UseAuthorization()
                 .UseEndpoints(endpoints =>
                 {

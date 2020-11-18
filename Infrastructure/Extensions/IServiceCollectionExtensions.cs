@@ -23,6 +23,8 @@ namespace Infrastructure.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IIdentityServerConfigurationUnitOfWork, IdentityServerConfigurationUnitOfWork>();
 
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
             return services;
         }
 
