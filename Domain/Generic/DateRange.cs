@@ -57,7 +57,7 @@ namespace Domain.Generic
 
                 return new DateRange(min, max);
             }
-            catch (Exception ex) { throw; }
+            catch (Exception) { throw; }
         }
 
         public override string ToString()
