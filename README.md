@@ -11,7 +11,7 @@
 
 ### Build Setup ###
 
-* Ensure you have installed [dotnet 3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1), [Entity Framework tools](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet) and [Microsoft SQL Server](https://docs.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server) at least developer edition.
+* Ensure you have installed [dotnet 5.0](https://dotnet.microsoft.com/download/dotnet/5.0), [Entity Framework tools](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet) and [Microsoft SQL Server](https://docs.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server) at least developer edition.
 * Open the Web folder of the solution, copy appsettings.example.json and save as appsettings.json. Set the DefaultConnection field in the ConnectionStrings section of appsettings.json to point to a database for the app in Microsoft SQL Server. Set your desired value for other fields in appsettings.json
 * From your CLI, navigate to Infrastructure folder of the solution and run the following commands:
 
