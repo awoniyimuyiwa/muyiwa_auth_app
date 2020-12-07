@@ -69,7 +69,7 @@ steps:
   inputs:
     command: custom
     custom: 'ef '
-    arguments: 'migrations script --startup-project $(Build.SourcesDirectory)/Web/Web.csproj --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context  DbContext --output $(Build.SourcesDirectory)/SQL/auth.sql --idempotent'
+    arguments: 'migrations script --startup-project ./Web/Web.csproj --project ./Infrastructure/Infrastructure.csproj --context  DbContext --output $(Build.SourcesDirectory)/SQL/auth.sql --idempotent'
 
 - task: DotNetCoreCLI@2
   displayName: 'Create identity-server persisted-grant SQL script'
