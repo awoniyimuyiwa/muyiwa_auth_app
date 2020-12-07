@@ -76,14 +76,14 @@ steps:
   inputs:
     command: custom
     custom: 'ef '
-    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context  PersistedGrantDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_persistedgrant.sql --idempotent'
+    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context PersistedGrantDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_persistedgrant.sql --idempotent'
 
 - task: DotNetCoreCLI@2
   displayName: 'Create identity-server configuration SQL script'
   inputs:
     command: custom
     custom: 'ef '
-    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context  ConfigurationDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_configuration.sql --idempotent'
+    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context ConfigurationDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_configuration.sql --idempotent'
 
 - task: DotNetCoreCLI@2
   displayName: 'Dotnet publish'
