@@ -27,14 +27,14 @@ steps:
   displayName: 'New manifest for tool'
   inputs: 
     command: custom
-    custom; 'new '
+    custom: 'new '
     arguments: tool-manifest
 
 - task: DotNetCoreCLI@2
   displayName: 'Install EF tool'
   inputs: 
     command: custom
-    custom; 'tool '
+    custom: 'tool '
     arguments: install dotnet-ef
 
 - task: NuGetToolInstaller@1
