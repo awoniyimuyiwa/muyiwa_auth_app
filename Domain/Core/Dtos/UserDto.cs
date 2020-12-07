@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 namespace Domain.Core.Dtos
 {
-    public class UserDto : BaseDto
+    public record UserDto : BaseDto
     {
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public bool IsSuspended { get; set; }
-        public ProfileDto Profile { get; set; }
-        public List<int> Roles { get; set; }
+        public string UserName { get; init; }
+        public string Email { get; init; }
+        public bool IsSuspended { get; init; }
+        public ProfileDto Profile { get; init; }
+        public List<int> Roles { get; init; }
     }
 
-    public class ProfileDto
+    public record ProfileDto
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Gender { get; set; }
-        public string DateOfBirth { get; set; }
+        public string FirstName { get; init; }
+        public string LastName { get; init; }
+        public string Gender { get; init; }
+        public string DateOfBirth { get; init; }
     }
 }

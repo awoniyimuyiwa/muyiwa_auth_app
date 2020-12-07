@@ -1,9 +1,9 @@
 ﻿namespace Domain.Generic
 {
-    public abstract class BaseDto
+    public record BaseDto
     {
-        public string Slug { get; set; }
-        public string CreatedAt { get; set; }
-        public string UpdatedAt { get; set; }
+        public string Slug { get; init; }
+        public string CreatedAt { get; init; }
+        public string UpdatedAt { get; init; }
     }
 }

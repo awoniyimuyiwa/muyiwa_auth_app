@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Domain.Core.Dtos
 {
-    public class RoleDto : BaseDto
+    public record RoleDto : BaseDto
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public List<int> Permissions { get; set; }
+        public string Name { get; init; }
+        public string Description { get; init; }
+        public List<int> Permissions { get; init; }
     }
 }

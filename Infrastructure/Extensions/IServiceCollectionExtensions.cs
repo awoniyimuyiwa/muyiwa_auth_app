@@ -23,8 +23,6 @@ namespace Infrastructure.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IIdentityServerConfigurationUnitOfWork, IdentityServerConfigurationUnitOfWork>();
 
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
             return services;
         }
 
@@ -56,6 +54,14 @@ namespace Infrastructure.Extensions
                 var uow = serviceProvider.GetRequiredService<IIdentityServerConfigurationUnitOfWork>();
                 return uow.CustomResourceStore;
             });
+
+            return services;
+        }
+
+        // This should be called only in development environment
+        public static IServiceCollection AddInfrastructureDatabaseDeveloperPageExceptionFilter(this IServiceCollection services)
+        {
+            services.AddDatabaseDeveloperPageExceptionFilter();
 
             return services;
         }

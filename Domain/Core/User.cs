@@ -32,12 +32,11 @@ namespace Domain.Core
                 var roleUser = new RoleUser();
                 roleUser.SetRole(role);
                 roleUser.SetUser(this);
-
                 RoleUsers.Add(roleUser);
             }
         }
 
-        public UserDto ToDto() => new UserDto()
+        public UserDto ToDto() => new()
         {
             Slug = Id.ToString(),
             UserName = UserName,
@@ -65,7 +64,7 @@ namespace Domain.Core
 
         public DateTime DateOfBirth { get; set; }
 
-        public ProfileDto ToDto() => new ProfileDto()
+        public ProfileDto ToDto() => new()
         {
             FirstName = FirstName,
             LastName = LastName,

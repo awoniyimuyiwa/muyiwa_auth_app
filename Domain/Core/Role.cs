@@ -27,16 +27,17 @@ namespace Domain.Core
 
         public void AddPermissions(params Permission[] permissions)
         {
-            var permissionRole = new PermissionRole();
             foreach(Permission permission in permissions)
             {
+                var permissionRole = new PermissionRole();
                 permissionRole.SetPermission(permission);
                 permissionRole.SetRole(this);
                 PermissionRoles.Add(permissionRole);
             }
         }
 
-        public RoleDto ToDto() => new RoleDto() {
+        public RoleDto ToDto() => new() 
+        {
             Slug = Id.ToString(),
             Name = Name,
             Description = Description,

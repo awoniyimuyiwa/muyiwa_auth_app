@@ -45,7 +45,8 @@ namespace Web.Pages.Admin.Roles
             [Display(Name = "Permissions")]
             public List<int> Permissions { get; set; }
 
-            public RoleDto ToDto() => new RoleDto {
+            public RoleDto ToDto() => new() 
+            {
                 Name = Name,
                 Description = Description,
                 Permissions = Permissions

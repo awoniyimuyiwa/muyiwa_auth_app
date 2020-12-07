@@ -1,22 +1,30 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:5.0-buster-slim AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 5000
+EXPOSE 5001
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0-buster AS build
 WORKDIR /src
-COPY ["Web/Web.csproj", "Web/"]
-RUN dotnet restore "Web/Web.csproj"
+# copy csproj and restore as distinct layers
+COPY *.sln .
+COPY Application/*.csproj ./Application/
+COPY Domain/*.csproj ./Domain/
+COPY Infrastructure/*.csproj ./Infrastructure/
+COPY Web/*.csproj ./Web/
+RUN dotnet restore
+# copy everything else and build
+COPY Application/. ./Application/
+COPY Domain/. ./Domain/
+COPY Infrastructure/. ./Infrastructure/
+COPY Web/. ./Web/
 COPY . .
 WORKDIR "/src/Web"
-RUN dotnet build "Web.csproj" -c Release -o /app/build
+RUN dotnet build "Web.csproj" --configuration Release --output /app/build
 
 FROM build AS publish
-RUN dotnet publish "Web.csproj" -c Release -o /app/publish
+RUN dotnet publish "Web.csproj" --configuration Release --output /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Web.dll"]
+ENTRYPOINT ["dotnet" "Web.dll"]

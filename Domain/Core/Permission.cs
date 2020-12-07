@@ -25,6 +25,7 @@ namespace Domain.Core
         // Unique constraint will be on this property rather than on Name property so as to ensure case-insensitivity of Name Property
         public string NormalizedName { get; private set; }
 
+        public string Slug { get; private set; }
         public string Description { get; set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
@@ -33,8 +34,9 @@ namespace Domain.Core
         // Declared just to make querying easier
         protected virtual List<PermissionRole> PermissionRoles { get; set; }
 
-        public PermissionDto ToDto() => new PermissionDto() {
-            Slug = Id.ToString(),
+        public PermissionDto ToDto() => new() 
+        {
+            Slug = Slug,
             Name = Name,
             Description = Description,
             CreatedAt = Formatter.Format(CreatedAt)

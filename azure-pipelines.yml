@@ -1,0 +1,93 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Install .NET Core SDK'
+  inputs:
+    version: 5.0.100
+    performMultiLevelLookup: true
+    #includePreviewVersions: true # Required for preview versions
+
+# This is required for installing dotnet ef locally instead of globally
+- task: DotNetCoreCLI@2
+  displayName: 'New manifest for tool'
+  inputs: 
+    command: custom
+    custom; 'new '
+    arguments: tool-manifest
+
+- task: DotNetCoreCLI@2
+  displayName: 'Install EF tool'
+  inputs: 
+    command: custom
+    custom; 'tool '
+    arguments: install dotnet-ef
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build'
+  inputs:
+    command: build
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)' # Update this to match your need
+
+- task: DotNetCoreCLI@2
+  displayName: 'Dotnet test'
+  inputs:
+    command: 'test'
+    arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'   
+    publishTestResults: true
+    projects: '**/*Tests/*.csproj' # update with your test project directory
+
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish code coverage report'
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Create SQL scripts'
+  inputs:
+    command: custom
+    custom: 'ef '
+    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --output $(Build.SourcesDirectory)/SQL/init.sql --idempotent'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Dotnet publish'
+  inputs:
+    command: publish
+    publishWebProjects: true
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true
+
+# this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish build artifacts'
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'build_artifacts'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish sql artifacts'
+  inputs:
+    pathtoPublish: '$(Build.SourcesDirectory)/SQL/init.sql ' 
+    artifactName: 'sql_artifacts'
