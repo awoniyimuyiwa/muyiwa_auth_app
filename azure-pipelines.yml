@@ -65,11 +65,25 @@ steps:
     summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Create SQL scripts'
+  displayName: 'Create Auth SQL script'
   inputs:
     command: custom
     custom: 'ef '
-    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --output $(Build.SourcesDirectory)/SQL/init.sql --idempotent'
+    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context  DbContext --output $(Build.SourcesDirectory)/SQL/auth.sql --idempotent'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Create identity-server persisted-grant SQL script'
+  inputs:
+    command: custom
+    custom: 'ef '
+    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context  PersistedGrantDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_persistedgrant.sql --idempotent'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Create identity-server configuration SQL script'
+  inputs:
+    command: custom
+    custom: 'ef '
+    arguments: 'migrations script --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context  ConfigurationDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_configuration.sql --idempotent'
 
 - task: DotNetCoreCLI@2
   displayName: 'Dotnet publish'
@@ -84,10 +98,22 @@ steps:
   displayName: 'Publish build artifacts'
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-    artifactName: 'build_artifacts'
+    artifactName: 'auth_app'
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish sql artifacts'
+  displayName: 'Publish auth sql artifact'
   inputs:
-    pathtoPublish: '$(Build.SourcesDirectory)/SQL/init.sql ' 
-    artifactName: 'sql_artifacts'
+    pathtoPublish: '$(Build.SourcesDirectory)/SQL/auth.sql ' 
+    artifactName: 'auth_sql'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish identity-server persisted-grant sql artifact'
+  inputs:
+    pathtoPublish: '$(Build.SourcesDirectory)/SQL/identityserver_persistedgrant.sql ' 
+    artifactName: 'identityserver_persistedgrant_sql'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish identity-server configuration sql artifact'
+  inputs:
+    pathtoPublish: '$(Build.SourcesDirectory)/SQL/identityserver_configuration.sql ' 
+    artifactName: 'identityserver_configuration_sql'
