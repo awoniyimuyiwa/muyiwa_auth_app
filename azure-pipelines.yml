@@ -72,9 +72,9 @@ steps:
 - task: DeleteFiles@1
   displayName: 'Delete content of mssqlserver/scripts'
   inputs:
-    SourceFolder: $(Build.SourcesDirectory)/mssqlserver/scripts
-    Contents: **/*
-    
+    SourceFolder: '$(Build.SourcesDirectory)/mssqlserver/scripts'
+    Contents: '**/*'
+
 - task: DotNetCoreCLI@2
   displayName: 'Create Auth SQL script'
   inputs:
