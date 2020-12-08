@@ -24,3 +24,4 @@
 **/dbscripts
 LICENSE
 README.md
+/mssqlserver/*
