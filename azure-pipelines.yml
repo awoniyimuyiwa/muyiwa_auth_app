@@ -76,14 +76,14 @@ steps:
   inputs:
     command: custom
     custom: 'ef '
-    arguments: 'migrations script --startup-project $(Build.SourcesDirectory)/Web/Web.csproj --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context PersistedGrantDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_persistedgrant.sql --idempotent'
+    arguments: 'migrations script --startup-project $(Build.SourcesDirectory)/Web/Web.csproj --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context  PersistedGrantDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_persistedgrant.sql --idempotent'
 
 - task: DotNetCoreCLI@2
   displayName: 'Create identity-server configuration SQL script'
   inputs:
     command: custom
     custom: 'ef '
-    arguments: 'migrations script --startup-project $(Build.SourcesDirectory)/Web/Web.csproj --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context ConfigurationDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_configuration.sql --idempotent'
+    arguments: 'migrations script --startup-project $(Build.SourcesDirectory)/Web/Web.csproj --project $(Build.SourcesDirectory)/Infrastructure/Infrastructure.csproj --context  ConfigurationDbContext --output $(Build.SourcesDirectory)/SQL/identityserver_configuration.sql --idempotent'
 
 - task: DotNetCoreCLI@2
   displayName: 'Dotnet publish'
@@ -103,17 +103,16 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish auth sql artifact'
   inputs:
-    pathtoPublish: '$(Build.SourcesDirectory)/SQL/auth.sql ' 
+    pathtoPublish: '$(Build.SourcesDirectory)/mssqlserver/scripts' 
     artifactName: 'auth_sql'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish identity-server persisted-grant sql artifact'
+task: Docker@2
+  displayName: 'Build and push image to container registry'
   inputs:
-    pathtoPublish: '$(Build.SourcesDirectory)/SQL/identityserver_persistedgrant.sql ' 
-    artifactName: 'identityserver_persistedgrant_sql'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish identity-server configuration sql artifact'
-  inputs:
-    pathtoPublish: '$(Build.SourcesDirectory)/SQL/identityserver_configuration.sql ' 
-    artifactName: 'identityserver_configuration_sql'
+    command: buildAndPush
+    repository: muyiwaauthapp
+    dockerfile: '**/Dockerfile'
+    containerRegistry: AzureContainerRegistry
+    tags: |
+      $(Build.BuildId)
+      latest
