@@ -67,7 +67,7 @@ steps:
 - task: CmdLine@2
   displayName: 'Rename appsettings.example.json as appsettings.json'
   inputs:
-    script: 'ren $(Build.SourcesDirectory)/Web/appsettings.example.json appsettings.json' 
+    script: rename $(Build.SourcesDirectory)\Web\appsettings.example.json $(Build.SourcesDirectory)\Web\appsettings.json 
 
 - task: DotNetCoreCLI@2
   displayName: 'Create Auth SQL script'
