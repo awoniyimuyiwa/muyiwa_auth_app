@@ -72,7 +72,7 @@ steps:
 - task: DeleteFiles@1
   displayName: 'Delete content of mssqlserver/scripts'
   inputs:
-    Contents: 'mssqlserver/scripts/*.sql'
+    Contents: '**/*.sql'
 
 - task: DotNetCoreCLI@2
   displayName: 'Create Auth SQL script'
