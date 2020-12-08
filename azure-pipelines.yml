@@ -69,6 +69,12 @@ steps:
   inputs:
     script: cd ./Web && rename appsettings.example.json appsettings.json && cd.. 
 
+- task: DeleteFiles@1
+  displayName: 'Delete content of mssqlserver/scripts'
+  inputs:
+    SourceFolder: $(Build.SourcesDirectory)/mssqlserver/scripts
+    Contents: **/*
+    
 - task: DotNetCoreCLI@2
   displayName: 'Create Auth SQL script'
   inputs:
