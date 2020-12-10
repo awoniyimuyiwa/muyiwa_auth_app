@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 variables:
   solution: '**/*.sln'
@@ -15,6 +15,11 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- task: CmdLine@2
+  displayName: 'Rename appsettings.example.json as appsettings.json'
+  inputs:
+    script: mv '$(Build.SourcesDirectory)/Web/appsettings.example.json' '$(Build.SourcesDirectory)/Web/appsettings.json'
+
 - task: UseDotNet@2
   displayName: 'Install .NET Core SDK'
   inputs:
@@ -63,11 +68,6 @@ steps:
   inputs:
     codeCoverageTool: 'Cobertura'
     summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
-
-- task: CmdLine@2
-  displayName: 'Rename appsettings.example.json as appsettings.json'
-  inputs:
-    script: cd ./Web && rename appsettings.example.json appsettings.json && cd..
 
 - task: DeleteFiles@1
   displayName: 'Delete content of dbmigration/scripts'
