@@ -27,4 +27,4 @@ RUN dotnet publish "Web.csproj" --configuration Release --output /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-CMD ["dotnet", "Web.dll"]
+ENTRYPOINT ["dotnet" "Web.dll"]

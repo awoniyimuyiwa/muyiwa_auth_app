@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.7'
 
 networks: 
   backend_network:
@@ -9,44 +9,30 @@ volumes:
     driver: local
 
 services: 
-  db:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+  backend:
+    build: ./Web
+    image: muyiwa_authapp:latest
+    depends_on:
+      - db
     environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "Secret123"
-    networks:
+      ConnectionStrings__DefaultConnection: "Server=db;database=authapp_db;User=sa;Password=Secret123"
+    init: true
+    network:
       - backend_network
     ports:
-      - "14331:1433"
+      - "5000:5000"
+      - "5001:5001"
+    restart: on-failure
+
+  db:
+    build: ./mssqlserver
+    init: true
+    environment:
+      ACCEPT_EULA: "Y"
+      DATABASE: "authapp_db"
+      SA_PASSWORD: "Secret123"
+    network:
+      - backend_network
     restart: on-failure
     volumes:
       - db_data:/var/opt/mssql
-
-  dbmigration:
-    build: ./dbmigration
-    image: muyiwa/auth-app/db-migration:latest
-    depends_on:
-      - db
-    init: true
-    environment:
-      SERVER: "db"
-      SA_PASSWORD: "password"
-      TIMEOUT: 240 #number of seconds to wait for database server before executing sql scripts
-    networks:
-      - backend_network
-    restart: on-failure
-
-  backend:
-    build: .
-    image: muyiwa/auth-app:latest
-    depends_on:
-      - dbmigration
-    environment:
-      ConnectionStrings__DefaultConnection: "Server=db;database=master;User=sa;Password=password;"
-    init: true
-    networks:
-      - backend_network
-    ports:
-      - "5000"
-      - "5001"
-    restart: on-failure

@@ -67,12 +67,7 @@ steps:
 - task: CmdLine@2
   displayName: 'Rename appsettings.example.json as appsettings.json'
   inputs:
-    script: cd ./Web && rename appsettings.example.json appsettings.json && cd..
-
-- task: DeleteFiles@1
-  displayName: 'Delete content of dbmigration/scripts'
-  inputs:
-    Contents: 'dbmigration/scripts/*.sql'
+    script: 'rename $(Build.SourcesDirectory)/Web/appsettings.example,json $(Build.SourcesDirectory)/Web/appsettings,json' 
 
 - task: DotNetCoreCLI@2
   displayName: 'Create Auth SQL script'
@@ -117,23 +112,23 @@ steps:
     artifactName: 'auth_sql'
 
 - task: Docker@2
-  displayName: 'Build and push auth-app image to container registry'
+  displayName: 'Build and push authapp image to container registry'
   inputs:
     containerRegistry: AzureContainerRegistry
     dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
     command: buildAndPush
-    repository: auth-app
+    repository: authapp
     tags: |
       $(Build.BuildId)
       latest
 
 - task: Docker@2
-  displayName: 'Build and push auth-app/db-migration image to container registry'
+  displayName: 'Build and push authapp-migration image to container registry'
   inputs:
     containerRegistry: AzureContainerRegistry
     command: buildAndPush
-    dockerfile: '$(Build.SourcesDirectory)/dbmigration/Dockerfile'
-    repository: auth-app/db-migration
+    dockerfile: '$(Build.SourcesDirectory)/mssqlserver/Dockerfile'
+    repository: authapp-migration
     tags: |
       $(Build.BuildId)
       latest
