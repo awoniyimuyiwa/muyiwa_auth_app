@@ -67,7 +67,7 @@ steps:
 - task: CmdLine@2
   displayName: 'Rename appsettings.example.json as appsettings.json'
   inputs:
-    script: cd ./Web && rename appsettings.example.json appsettings.json && cd..
+    script: cd ./Web && mv appsettings.example.json appsettings.json && cd..
 
 - task: DeleteFiles@1
   displayName: 'Delete content of dbmigration/scripts'
